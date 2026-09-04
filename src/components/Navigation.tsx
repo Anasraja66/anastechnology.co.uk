@@ -39,21 +39,11 @@ const Navigation = () => {
 
   return (
     // The main navigation container, fixed at the top and centered
-    <nav className="fixed top-4 left-1/2 -translate-x-1/2 z-50">
-      {/* The "pill" shaped container for the navigation items */}
-      {/*
-        - `transition-all duration-500 ease-out`: Ensures smooth transitions for
-          opacity, scale, background color, and transform properties.
-        - `opacity-0 translate-y-[-20px]`: Initial state when `!isMounted` (hidden and slightly above).
-        - `opacity-100 translate-y-0`: State when `isMounted` (fully visible and in place).
-        - `bg-black/30`: Applied when `scrolled` is true, making the background semi-transparent.
-        - `scale-95`: Applied when `scrolled` is true (shrinks slightly).
-        - `backdrop-filter: blur(8px)`: Applied via inline style for the glassy effect.
-        - The `isMounted` condition ensures the scroll effect only applies after the initial render animation.
-      */}
+    <nav className="fixed top-0 md:top-4 left-1/2 -translate-x-1/2 z-50 w-full md:w-auto">
       <div
         className={cn(
-          "text-white rounded-full shadow-lg pr-4 md:pr-12 pl-4 py-3 flex items-center justify-between md:justify-start space-x-0 md:space-x-8 w-[calc(100vw-2rem)] md:w-auto mx-auto",
+          "text-white shadow-lg pr-4 md:pr-12 pl-4 py-3 flex items-center justify-between md:justify-start space-x-0 md:space-x-8 w-full md:w-auto mx-auto",
+          "rounded-none md:rounded-full", // Full width on mobile, rounded pill on desktop
           "transition-all duration-500 ease-out", // Overall transition for all animated properties
           {
             // Initial render animation: hidden above, then slides down and fades in
@@ -62,16 +52,16 @@ const Navigation = () => {
           },
           // On-scroll animation: changes background to semi-transparent black and shrinks (only if already mounted)
           {
-            "bg-black/30": scrolled && isMounted, // Semi-transparent black for glassy effect
+            "bg-black/90 md:bg-black/80": scrolled && isMounted, // Solid black on mobile when scrolled to prevent text overlap, semi-transparent on desktop
             "bg-[#212121]": !scrolled || !isMounted, // Original background when not scrolled or not mounted
-            "scale-95": scrolled && isMounted,
+            "scale-100 md:scale-95": scrolled && isMounted, // Don't scale down on mobile to keep full width
             "scale-100": !scrolled && isMounted,
           }
         )}
         style={{
-          // Apply backdrop-filter for the glassy blur effect when scrolled
-          backdropFilter: scrolled && isMounted ? 'blur(8px)' : 'none',
-          WebkitBackdropFilter: scrolled && isMounted ? 'blur(8px)' : 'none', // For Safari compatibility
+          // Apply the backdrop-filter inline for maximum browser compatibility
+          backdropFilter: scrolled ? 'blur(12px)' : 'none',
+          WebkitBackdropFilter: scrolled ? 'blur(12px)' : 'none',
         }}
       >
         {/* Logo/Icon on the left, within its own rounded container */}

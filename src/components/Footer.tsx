@@ -48,10 +48,14 @@ const Footer = () => {
         <div className="grid lg:grid-cols-3 gap-12 lg:gap-8 mb-12 relative z-10">
           {/* Column 1: About Anas */}
           <div className="space-y-6">
-            <h3 className="text-2xl font-display font-bold text-transparent bg-clip-text bg-gradient-primary">
-              Anas Technology UK
-            </h3>
-            <p className="text-muted-foreground leading-relaxed pr-4">
+            <Link to="/">
+              <img 
+                src="/src/assets/anas-logo.png" 
+                alt="Anas Technology UK" 
+                className="h-16 w-auto object-contain bg-white rounded-lg p-2" 
+              />
+            </Link>
+            <p className="text-muted-foreground leading-relaxed pr-4 mt-4">
               We advance the machine elements of digital transformation, developing enterprise software, AI, and digital ecosystems that redefine industries globally.
             </p>
             <div className="flex gap-4 pt-2">

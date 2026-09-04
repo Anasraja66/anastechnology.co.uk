@@ -174,7 +174,7 @@ const ServicesSection: React.FC = () => {
               </Link>
 
               {/* Two Square Cards */}
-              <div className="grid grid-cols-2 gap-4 flex-1" data-aos="fade-up" data-aos-delay="900">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1" data-aos="fade-up" data-aos-delay="900">
                 <Link to={services[3].link} className="block group">
                   <div 
                     className="service-card small-card h-full"

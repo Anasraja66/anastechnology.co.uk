@@ -21,11 +21,7 @@ const Contact = () => {
   const { toast } = useToast();
   const [showAddressPopup, setShowAddressPopup] = useState(false); // State for address popup
 
-  // State for Appointment Booking
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
-  const [selectedTime, setSelectedTime] = useState<string | null>(null);
-  const [appointmentName, setAppointmentName] = useState("");
-  const [appointmentEmail, setAppointmentEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     AOS.init({
@@ -35,15 +31,13 @@ const Contact = () => {
     AOS.refresh();
   }, []);
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.name || !formData.email || !formData.subject) {
       toast({
         title: "Missing Information",
-        description: "Please fill in all required fields (Name, Email, Subject).",
+        description: "Please fill in all required fields.",
         variant: "destructive"
       });
       return;
@@ -59,22 +53,24 @@ const Contact = () => {
             'Accept': 'application/json'
         },
         body: JSON.stringify({
-            _subject: `New Message from ${formData.name} - ${formData.subject}`,
+            _subject: `New Contact Form Submission: ${formData.subject}`,
             Name: formData.name,
             Email: formData.email,
-            Subject: formData.subject,
-            Message: formData.message || "No message provided."
+            Message: formData.message,
+            RequestType: "Contact Form"
         })
       });
 
       if (response.ok) {
         toast({
           title: "Message Sent!",
-          description: "Thank you for contacting us. We'll get back to you within 24 hours.",
+          description: "We've received your message and will get back to you soon.",
         });
+
+        // Reset contact form
         setFormData({ name: "", email: "", subject: "", message: "" });
       } else {
-        throw new Error("Failed to send message");
+        throw new Error("Failed to submit form");
       }
     } catch (error) {
       toast({
@@ -92,61 +88,6 @@ const Contact = () => {
       ...formData,
       [e.target.name]: e.target.value
     });
-  };
-
-  const handleAppointmentBooking = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedDate || !selectedTime || !appointmentName || !appointmentEmail) {
-      toast({
-        title: "Missing Appointment Details",
-        description: "Please select a date, time, and provide your name and email for the appointment.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      const response = await fetch("https://formsubmit.co/ajax/contact@anastechnology.co.uk", {
-        method: "POST",
-        headers: { 
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-            _subject: `New Appointment Booking: ${appointmentName}`,
-            Name: appointmentName,
-            Email: appointmentEmail,
-            Date: selectedDate.toDateString(),
-            Time: selectedTime,
-            RequestType: "Appointment Booking"
-        })
-      });
-
-      if (response.ok) {
-        toast({
-          title: "Appointment Booked!",
-          description: `Your appointment for ${selectedDate.toDateString()} at ${selectedTime} has been requested. We'll send a confirmation to ${appointmentEmail}.`,
-        });
-
-        // Reset appointment form
-        setSelectedDate(undefined);
-        setSelectedTime(null);
-        setAppointmentName("");
-        setAppointmentEmail("");
-      } else {
-        throw new Error("Failed to book appointment");
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "There was a problem booking your appointment. Please try again later.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
   };
 
   const fullAddress = (
@@ -355,85 +296,25 @@ const Contact = () => {
 
       {/* Appointment Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <Card className="p-8 bg-card border border-border rounded-3xl shadow-sm" data-aos="fade-up">
-          <h2 className="text-3xl font-display font-bold mb-8 gradient-text text-center">
-            Book an Appointment
-          </h2>
-
-          {!selectedDate ? (
-            <div className="flex flex-col items-center">
-              <p className="text-lg text-muted-foreground mb-4">Select a date:</p>
-              <Calendar
-                mode="single"
-                selected={selectedDate}
-                onSelect={setSelectedDate}
-                disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-                className="rounded-md border shadow bg-card text-card-foreground"
-              />
-            </div>
-          ) : !selectedTime ? (
-            <div className="flex flex-col items-center">
-              <p className="text-lg text-muted-foreground mb-4">Select a time for {selectedDate.toDateString()}:</p>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                {timeSlots.map(slot => (
-                  <Button
-                    key={slot}
-                    variant={selectedTime === slot ? "default" : "outline"}
-                    onClick={() => setSelectedTime(slot)}
-                    className="w-full"
-                  >
-                    {slot}
-                  </Button>
-                ))}
-              </div>
-              <Button variant="ghost" onClick={() => setSelectedDate(null)} className="mt-4">
-                <ChevronLeft className="w-4 h-4 mr-2" /> Back to Dates
-              </Button>
-            </div>
-          ) : (
-            <form onSubmit={handleAppointmentBooking} className="space-y-6">
-              <h3 className="text-xl font-semibold text-foreground text-center mb-4">
-                Confirm your appointment for {selectedDate.toDateString()} at {selectedTime}
-              </h3>
-              <div>
-                <label htmlFor="appointmentName" className="block text-sm font-medium text-card-foreground mb-2">
-                  Your Name
-                </label>
-                <Input
-                  id="appointmentName"
-                  name="appointmentName"
-                  value={appointmentName}
-                  onChange={(e) => setAppointmentName(e.target.value)}
-                  placeholder="Your name"
-                  className="bg-background border-border focus:border-primary rounded-lg"
-                  required
-                />
-              </div>
-              <div>
-                <label htmlFor="appointmentEmail" className="block text-sm font-medium text-card-foreground mb-2">
-                  Your Email
-                </label>
-                <Input
-                  id="appointmentEmail"
-                  name="appointmentEmail"
-                  type="email"
-                  value={appointmentEmail}
-                  onChange={(e) => setAppointmentEmail(e.target.value)}
-                  placeholder="Your email"
-                  className="bg-background border-border focus:border-primary rounded-lg"
-                  required
-                />
-              </div>
-              <div className="flex justify-end gap-4">
-                <Button variant="outline" onClick={() => setSelectedTime(null)}>
-                  Back to Times
-                </Button>
-                <Button type="submit" disabled={isSubmitting} className="bg-gradient-primary disabled:opacity-70 disabled:cursor-not-allowed">
-                  {isSubmitting ? "Booking..." : "Book Appointment"}
-                </Button>
-              </div>
-            </form>
-          )}
+        <Card className="bg-card border border-border rounded-3xl shadow-sm overflow-hidden" data-aos="fade-up">
+          <div className="p-8 pb-4">
+            <h2 className="text-3xl font-display font-bold mb-2 gradient-text text-center">
+              Book a Strategy Call
+            </h2>
+            <p className="text-muted-foreground text-center mb-8">
+              Pick a time on our calendar to discuss your digital transformation needs.
+            </p>
+          </div>
+          <div className="w-full bg-white relative">
+            <iframe 
+              src="https://calendar.google.com/calendar/appointments/schedules/AcZssZ2_dG1au4THNXeZ0p3t5-KvYoaZikIq7swKIKBV4yWTDN0zeYdOsjbBb77kS_cKk2OS9HUeWbWG?gv=true" 
+              style={{ border: 0 }} 
+              width="100%" 
+              height="600" 
+              frameBorder="0"
+              title="Google Calendar Booking"
+            ></iframe>
+          </div>
         </Card>
       </section>
 
