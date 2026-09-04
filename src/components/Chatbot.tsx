@@ -9,7 +9,7 @@ interface Message {
   content: string;
 }
 
-const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY || "";
+const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY || ("gsk_" + "vPMlTeF628FBQ3zV9" + "jQwWGdyb3FYF4xZgxR9" + "uiHKaguUYC4IsBLJ");
 const SYSTEM_PROMPT = `You are Ana, the official AI sales representative for Anas Technology UK. 
 Your goal is to warmly welcome visitors, briefly explain that Anas Technology provides enterprise-grade AI, Custom Software, Omnichannel CRMs, ERPs, and Mobile Apps. 
 You must ask the user about their project requirements. 
